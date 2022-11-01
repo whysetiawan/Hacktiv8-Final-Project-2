@@ -1,0 +1,122 @@
+basePath: /api
+definitions:
+  dto.CreateTodoDto:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  models.UserModel:
+    properties:
+      created_at:
+        type: string
+      name:
+        type: string
+      status:
+        type: boolean
+      todo_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  utils.HttpError:
+    properties:
+      message: {}
+      stack_trace: {}
+    type: object
+  utils.HttpSuccess-any:
+    properties:
+      data: {}
+      message: {}
+    type: object
+  utils.HttpSuccess-models_UserModel:
+    properties:
+      data:
+        $ref: '#/definitions/models.UserModel'
+      message: {}
+    type: object
+host: localhost:3030
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  /todo:
+    post:
+      parameters:
+      - description: Create Todo DTO
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTodoDto'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      summary: create a todo
+      tags:
+      - Todo
+  /todo/{id}:
+    delete:
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess-models_UserModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      summary: create a todo
+      tags:
+      - Todo
+  /todo/update/{id}:
+    put:
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess-models_UserModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      summary: update a todo
+      tags:
+      - Todo
+swagger: "2.0"
