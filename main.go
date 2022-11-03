@@ -23,16 +23,18 @@ import (
 // @license.name Apache 2.0
 // @license.url  http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host     localhost:3030
-// @BasePath /api
+// @host                       localhost:3030
+// @BasePath                   /api
+// @securityDefinitions.apikey BearerAuth
+// @in                         header
+// @name                       Authorization
 func main() {
 
-	err := godotenv.Load(".env")
+	err := godotenv.Load()
 
 	if err != nil {
 		log.Fatal("Environment Variables not found")
 	}
-
 	app := gin.Default()
 	appRoute := app.Group("/api")
 	db, _ := config.Connect()
@@ -40,8 +42,8 @@ func main() {
 	userRepository := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepository)
 	authService := services.NewAuthService()
+	fmt.Println("THIS AUTH SERVICE", authService.JWT_SECRET_KEY)
 	userController := controllers.NewUserController(userService, authService)
-
 	// todoRepository := repositories.NewTodoRepository(db)
 	// todoService := services.NewTodoService(todoRepository)
 	// todoController := controllers.NewTodoController(todoService)

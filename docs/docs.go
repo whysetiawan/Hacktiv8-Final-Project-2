@@ -26,6 +26,11 @@ const docTemplate = `{
     "paths": {
         "/user": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "User"
                 ],
@@ -375,6 +380,13 @@ const docTemplate = `{
                 },
                 "message": {}
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

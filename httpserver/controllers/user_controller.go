@@ -108,13 +108,14 @@ func (c *userController) Login(ctx *gin.Context) {
 }
 
 // GetUsers godoc
-// @Tags    User
-// @Summary get mutilple users
-// @Success 200 {object} utils.HttpSuccess[[]models.UserModel]
-// @Failure 401 {object} utils.HttpError
-// @Failure 400 {object} utils.HttpError
-// @Failure 500 {object} utils.HttpError
-// @Router  /user [get]
+// @Tags     User
+// @Summary  get mutilple users
+// @Success  200 {object} utils.HttpSuccess[[]models.UserModel]
+// @Failure  401 {object} utils.HttpError
+// @Failure  400 {object} utils.HttpError
+// @Failure  500 {object} utils.HttpError
+// @Router   /user [get]
+// @Security BearerAuth
 func (c *userController) GetUsers(ctx *gin.Context) {
 	users, err := c.userService.GetUsers()
 	if err != nil {

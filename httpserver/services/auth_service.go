@@ -5,6 +5,7 @@ import (
 	"errors"
 	"final-project-2/httpserver/models"
 	"final-project-2/utils"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -20,19 +21,21 @@ type authService struct {
 }
 
 func NewAuthService() *authService {
+	constants := &utils.Constants
+	print("constants.JWT_SECRET_KEY", constants.JWT_SECRET_KEY)
 	return &authService{
-		JWT_SECRET_KEY: utils.Constants.JWT_SECRET_KEY,
+		JWT_SECRET_KEY: constants.JWT_SECRET_KEY,
 	}
 }
 
 func (s *authService) VerifyToken(accessToken string) (bool, interface{}, error) {
 
 	jwtToken, err := jwt.Parse(accessToken, func(t *jwt.Token) (interface{}, error) {
-		method, isRsa := t.Method.(*jwt.SigningMethodRSA)
+		method, isRsa := t.Method.(*jwt.SigningMethodHMAC)
 		if !isRsa {
 			return nil, errors.New("invalid algorithm")
 		}
-		if method != jwt.SigningMethodRS256 {
+		if method != jwt.SigningMethodHS256 {
 			return nil, errors.New("invalid algorithm")
 		}
 
@@ -79,16 +82,16 @@ func (s *authService) GenerateToken(user *models.UserModel) (string, string, err
 		"data": userMap,
 		"exp":  time.Now().UTC().Add(ttlRefreshToken).Unix(),
 	}
-
+	fmt.Println("SECRET KEY", s.JWT_SECRET_KEY)
 	var secretKeyByte = []byte(s.JWT_SECRET_KEY)
 
-	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodRS256, accessClaims).SignedString(secretKeyByte)
+	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims).SignedString(secretKeyByte)
 
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodRS256, refreshClaims).SignedString(secretKeyByte)
+	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString(secretKeyByte)
 
 	if err != nil {
 		return "", "", err
