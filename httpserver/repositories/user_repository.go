@@ -12,37 +12,33 @@ type TodoRepository interface {
 	UpdateTodo(data models.UserModel, id int64) (models.UserModel, error)
 }
 
-type todoRepository struct {
+type UserRepository interface {
+	Register(user *models.UserModel) (*models.UserModel, error)
+	Login(user *models.UserModel) (*models.UserModel, error)
+}
+
+type userRepository struct {
 	db *gorm.DB
 }
 
-func NewTodoRepository(db *gorm.DB) *todoRepository {
-	return &todoRepository{db}
+func NewUserRepository(db *gorm.DB) *userRepository {
+	return &userRepository{db}
 }
 
-func (r *todoRepository) CreateTodo(todo models.UserModel) (models.UserModel, error) {
-	err := r.db.Create(&todo).Error
+func (r *userRepository) Register(user *models.UserModel) (*models.UserModel, error) {
+	err := r.db.Create(user).Error
 	if err != nil {
-		return todo, err
+		return user, err
 	}
-	return todo, nil
+	return user, nil
 }
 
-func (r *todoRepository) DeleteTodo(todo models.UserModel) (models.UserModel, error) {
-	err := r.db.Delete(&todo).Error
-	if err != nil {
-		return todo, err
-	}
-	return todo, nil
-}
+func (r *userRepository) Login(user *models.UserModel) (*models.UserModel, error) {
+	err := r.db.Find(&user).Where("email = ?", user.Email).Error
 
-func (r *todoRepository) UpdateTodo(data models.UserModel, id int64) (models.UserModel, error) {
-	err := r.db.Model(&data).Where("todo_id", id).Updates(models.UserModel{
-		// Status: true,
-	})
 	if err != nil {
-		return data, err.Error
+		return user, err
 	}
 
-	return data, nil
+	return user, nil
 }

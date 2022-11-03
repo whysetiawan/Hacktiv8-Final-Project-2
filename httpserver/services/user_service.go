@@ -12,52 +12,43 @@ type TodoService interface {
 	UpdateTodo(inputID int64, inputData dto.UpdateTodoDto) (map[string]string, error)
 }
 
-type todoService struct {
-	todoRepository repositories.TodoRepository
+type UserService interface {
+	Register(dto *dto.RegisterDto) (*models.UserModel, error)
+	Login(dto *dto.LoginDto) (*models.UserModel, error)
 }
 
-func NewTodoService(tr repositories.TodoRepository) *todoService {
-	return &todoService{
-		tr,
-	}
+type userService struct {
+	userRepository repositories.UserRepository
 }
 
-func (s *todoService) CreateTodo(dto dto.CreateTodoDto) (models.UserModel, error) {
-	todo := models.UserModel{
-		// Name: dto.Name,
+func NewUserService(r repositories.UserRepository) *userService {
+	return &userService{r}
+}
+
+func (s *userService) Register(dto *dto.RegisterDto) (*models.UserModel, error) {
+	user := models.UserModel{
+		Username: dto.Username,
+		Email:    dto.Email,
+		Password: dto.Password,
+		Age:      dto.Age,
 	}
 
-	todo, err := s.todoRepository.CreateTodo(todo)
+	_, err := s.userRepository.Register(&user)
 	if err != nil {
-		return todo, err
+		return &user, err
 	}
-	return todo, nil
+	return &user, nil
 }
 
-func (s *todoService) DeleteTodo(id uint) error {
-	todo := models.UserModel{
-		// TodoId: id,
+func (s *userService) Login(dto *dto.LoginDto) (*models.UserModel, error) {
+	user := models.UserModel{
+		Email:    dto.Email,
+		Password: dto.Password,
 	}
-	todo, err := s.todoRepository.DeleteTodo(todo)
 
-	return err
-}
-
-func (s *todoService) UpdateTodo(inputID int64, inputData dto.UpdateTodoDto) (map[string]string, error) {
-	_, err := s.todoRepository.UpdateTodo(models.UserModel{
-		// Status: inputData.Status,
-	}, inputID)
-
+	_, err := s.userRepository.Login(&user)
 	if err != nil {
-		return map[string]string{
-			"en":    "fail to update status, please retry later",
-			"id":    "update gagal",
-			"error": err.Error(),
-		}, err
+		return &user, err
 	}
-
-	return map[string]string{
-		"en": "success",
-		"id": "success update data",
-	}, nil
+	return &user, nil
 }

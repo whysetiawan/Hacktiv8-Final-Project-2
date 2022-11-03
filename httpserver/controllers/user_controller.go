@@ -2,128 +2,106 @@ package controllers
 
 import (
 	"final-project-2/httpserver/dto"
+	"final-project-2/httpserver/models"
 	"final-project-2/httpserver/services"
 	"final-project-2/utils"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
-type TodoController interface {
-	CreateTodo(ctx *gin.Context)
-	DeleteTodo(ctx *gin.Context)
-	UpdateTodo(ctx *gin.Context)
+type UserController interface {
+	Register(ctx *gin.Context)
+	Login(ctx *gin.Context)
 }
 
-type todoController struct {
-	todoService services.TodoService
+type userController struct {
+	userService services.UserService
+	authService services.AuthService
 }
 
-func NewTodoController(todoService services.TodoService) *todoController {
-	return &todoController{
-		todoService,
-	}
+func NewUserController(
+	userService services.UserService,
+	authService services.AuthService,
+) *userController {
+	return &userController{userService, authService}
 }
 
-// CreateTodo godoc
-// @Tags    Todo
-// @Summary create a todo
-// @Param   todo body     dto.CreateTodoDto true "Create Todo DTO"
-// @Success 200  {object} utils.HttpSuccess[any]
+// Register godoc
+// @Tags    User
+// @Summary create a user
+// @Param   user body     dto.RegisterDto true "Create User DTO"
+// @Success 201  {object} utils.HttpSuccess[dto.RegisterDto]
 // @Failure 400  {object} utils.HttpError
 // @Failure 500  {object} utils.HttpError
-// @Router  /todo [post]
-func (c *todoController) CreateTodo(ctx *gin.Context) {
-	var dto dto.CreateTodoDto
-	err := ctx.ShouldBindJSON(&dto)
+// @Router  /user/register [post]
+func (c *userController) Register(ctx *gin.Context) {
+	var dto dto.RegisterDto
+	err := ctx.BindJSON(&dto)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", err.Error()))
 		return
 	}
 
-	todo, err := c.todoService.CreateTodo(dto)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.NewHttpError("Internal Server Error", err.Error()))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, utils.NewHttpSuccess("Todo Created", todo))
-}
+	dto.Password = string(hashedPassword)
 
-// DeleteTodo godoc
-// @Tags    Todo
-// @Summary create a todo
-// @Param   id  path     int true "Todo ID"
-// @Success 200 {object} utils.HttpSuccess[models.UserModel]
-// @Failure 400 {object} utils.HttpError
-// @Failure 500 {object} utils.HttpError
-// @Router  /todo/{id} [delete]
-func (c *todoController) DeleteTodo(ctx *gin.Context) {
-	idDto := ctx.Param("id")
-	id, err := strconv.Atoi(idDto)
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", err.Error()))
-		return
-	}
-
-	err = c.todoService.DeleteTodo(uint(id))
+	_, err = c.userService.Register(&dto)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.NewHttpError("Internal Server Error", err.Error()))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, utils.NewHttpSuccess[any]("Todo Deleted", nil))
+	ctx.JSON(http.StatusCreated, utils.NewHttpSuccess("User Registered", &dto))
 }
 
-// UpdateTodo godoc
-// @Tags    Todo
-// @Summary update a todo
-// @Param   id  path     int true "Todo ID"
-// @Success 200 {object} utils.HttpSuccess[models.UserModel]
-// @Failure 400 {object} utils.HttpError
-// @Failure 500 {object} utils.HttpError
-// @Router  /todo/update/{id} [put]
-func (c *todoController) UpdateTodo(ctx *gin.Context) {
-	respData := &utils.ResponseData{
-		Status: "Fail",
-	}
-
-	var param dto.UpdateTodoDto
-
-	todo_id := ctx.Param("id")
-	id, _ := strconv.Atoi(todo_id)
-
-	err := ctx.ShouldBindJSON(&param)
+// Login godoc
+// @Tags    User
+// @Summary login a user
+// @Param   user body     dto.LoginDto true "Login User DTO"
+// @Success 200  {object} utils.HttpSuccess[models.LoginResponse]
+// @Failure 400  {object} utils.HttpError
+// @Failure 500  {object} utils.HttpError
+// @Router  /user/login [post]
+func (c *userController) Login(ctx *gin.Context) {
+	var dto dto.LoginDto
+	err := ctx.BindJSON(&dto)
 	if err != nil {
-		respData.Message = map[string]string{
-			"error":  err.Error(),
-			"status": "error binding json",
-		}
-		ctx.JSON(http.StatusInternalServerError, respData)
+		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", err.Error()))
 		return
 	}
 
-	msg, err := c.todoService.UpdateTodo(int64(id), param)
-	if err != nil {
-		respData.Message = map[string]string{
-			"error":  err.Error(),
-			"status": "error update data",
-		}
+	user, err := c.userService.Login(&dto)
 
-		ctx.JSON(http.StatusBadRequest, msg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.NewHttpError("Internal Server Error", err.Error()))
 		return
 	}
 
-	respData = &utils.ResponseData{
-		Status:  http.StatusOK,
-		Message: msg,
-		Details: nil,
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.Password))
+	print(dto.Password)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, utils.NewHttpError("Invalid Credentials", err.Error()))
+		return
 	}
 
-	ctx.JSON(http.StatusOK, respData)
+	accessToken, refreshToken, err := c.authService.GenerateToken(user)
 
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.NewHttpError("Internal Server Error", err.Error()))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, utils.NewHttpSuccess("Login Success", models.LoginResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}))
 }

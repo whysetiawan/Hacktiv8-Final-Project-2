@@ -1,5 +1,5 @@
 server:
-	nodemon --ignore docs/ --exec go run main.go --signal SIGTERM
+	nodemon --config ./nodemon.json  --exec go run main.go --signal SIGTERM --verbose
 
 
 

@@ -37,17 +37,22 @@ func main() {
 	appRoute := app.Group("/api")
 	db, _ := config.Connect()
 
-	todoRepository := repositories.NewTodoRepository(db)
-	todoService := services.NewTodoService(todoRepository)
-	todoController := controllers.NewTodoController(todoService)
+	userRepository := repositories.NewUserRepository(db)
+	userService := services.NewUserService(userRepository)
+	authService := services.NewAuthService()
+	userController := controllers.NewUserController(userService, authService)
 
-	routers.TodoRouter(appRoute, todoController)
+	// todoRepository := repositories.NewTodoRepository(db)
+	// todoService := services.NewTodoService(todoRepository)
+	// todoController := controllers.NewTodoController(todoService)
+
+	routers.UserRouter(appRoute, userController)
 
 	docs.SwaggerInfo.Title = "Hacktiv8 final-project-2 API"
 	docs.SwaggerInfo.Description = "This is just a simple TODO List"
-	docs.SwaggerInfo.Host = "localhost"
+	docs.SwaggerInfo.Host = "localhost:3000"
 	docs.SwaggerInfo.BasePath = "/api"
-	docs.SwaggerInfo.Schemes = []string{"https", "http"}
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	// log.Println("Generating Swagger")
 	// path, err := os.Getwd()

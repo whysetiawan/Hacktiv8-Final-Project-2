@@ -1,23 +1,36 @@
 basePath: /api
 definitions:
-  dto.CreateTodoDto:
+  dto.LoginDto:
     properties:
-      name:
+      email:
+        type: string
+      password:
         type: string
     required:
-    - name
+    - email
+    - password
     type: object
-  models.UserModel:
+  dto.RegisterDto:
     properties:
-      created_at:
-        type: string
-      name:
-        type: string
-      status:
-        type: boolean
-      todo_id:
+      age:
         type: integer
-      updated_at:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - age
+    - email
+    - password
+    - username
+    type: object
+  models.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
         type: string
     type: object
   utils.HttpError:
@@ -25,15 +38,16 @@ definitions:
       message: {}
       stack_trace: {}
     type: object
-  utils.HttpSuccess-any:
-    properties:
-      data: {}
-      message: {}
-    type: object
-  utils.HttpSuccess-models_UserModel:
+  utils.HttpSuccess-dto_RegisterDto:
     properties:
       data:
-        $ref: '#/definitions/models.UserModel'
+        $ref: '#/definitions/dto.RegisterDto'
+      message: {}
+    type: object
+  utils.HttpSuccess-models_LoginResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.LoginResponse'
       message: {}
     type: object
 host: localhost:3030
@@ -46,20 +60,20 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 paths:
-  /todo:
+  /user/login:
     post:
       parameters:
-      - description: Create Todo DTO
+      - description: Login User DTO
         in: body
-        name: todo
+        name: user
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateTodoDto'
+          $ref: '#/definitions/dto.LoginDto'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.HttpSuccess-any'
+            $ref: '#/definitions/utils.HttpSuccess-models_LoginResponse'
         "400":
           description: Bad Request
           schema:
@@ -68,22 +82,23 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HttpError'
-      summary: create a todo
+      summary: login a user
       tags:
-      - Todo
-  /todo/{id}:
-    delete:
+      - User
+  /user/register:
+    post:
       parameters:
-      - description: Todo ID
-        in: path
-        name: id
+      - description: Create User DTO
+        in: body
+        name: user
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/dto.RegisterDto'
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            $ref: '#/definitions/utils.HttpSuccess-models_UserModel'
+            $ref: '#/definitions/utils.HttpSuccess-dto_RegisterDto'
         "400":
           description: Bad Request
           schema:
@@ -92,31 +107,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HttpError'
-      summary: create a todo
+      summary: create a user
       tags:
-      - Todo
-  /todo/update/{id}:
-    put:
-      parameters:
-      - description: Todo ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utils.HttpSuccess-models_UserModel'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HttpError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HttpError'
-      summary: update a todo
-      tags:
-      - Todo
+      - User
 swagger: "2.0"
