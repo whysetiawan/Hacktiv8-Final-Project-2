@@ -5,15 +5,13 @@ import (
 	"errors"
 	"final-project-2/httpserver/models"
 	"final-project-2/utils"
-	"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
 type AuthService interface {
-	VerifyToken(c *gin.Context) (interface{}, error)
+	VerifyToken(token string) (bool, interface{}, error)
 	GenerateToken(user *models.UserModel) (string, string, error)
 }
 
@@ -27,45 +25,39 @@ func NewAuthService() *authService {
 	}
 }
 
-func (s *authService) VerifyToken(c *gin.Context) (interface{}, error) {
-	errResponse := errors.New("Unauthorized")
-	headerToken := c.Request.Header.Get("Authorization")
-	bearer := strings.HasPrefix(headerToken, "Bearer")
+func (s *authService) VerifyToken(accessToken string) (bool, interface{}, error) {
 
-	if !bearer {
-		return nil, errResponse
-	}
-
-	if len(strings.Split(headerToken, " ")) < 2 {
-		return nil, errResponse
-	}
-
-	stringToken := strings.Split(headerToken, " ")[1]
-
-	token, err := jwt.Parse(stringToken, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errResponse
+	jwtToken, err := jwt.Parse(accessToken, func(t *jwt.Token) (interface{}, error) {
+		method, isRsa := t.Method.(*jwt.SigningMethodRSA)
+		if !isRsa {
+			return nil, errors.New("invalid algorithm")
+		}
+		if method != jwt.SigningMethodRS256 {
+			return nil, errors.New("invalid algorithm")
 		}
 
 		return []byte(s.JWT_SECRET_KEY), nil
 	})
 
-	if token == nil {
-		return nil, errResponse
+	if jwtToken == nil {
+		return false, nil, errors.New("invalid token")
 	}
 
 	if err != nil {
-		v, _ := err.(*jwt.ValidationError)
-		if v.Errors == jwt.ValidationErrorExpired {
-			return nil, errResponse
+		validation, _ := err.(*jwt.ValidationError)
+		if validation.Errors == jwt.ValidationErrorExpired {
+			return false, nil, errors.New("token expired")
 		}
 	}
 
-	if _, ok := token.Claims.(jwt.MapClaims); !ok && !token.Valid {
-		return nil, errResponse
+	_, ok := jwtToken.Claims.(jwt.MapClaims)
+
+	if !ok || !jwtToken.Valid {
+		return false, nil, errors.New("invalid token")
 	}
 
-	return token.Claims.(jwt.MapClaims), nil
+	return true, jwtToken.Claims.(jwt.MapClaims), nil
+
 }
 
 func (s *authService) GenerateToken(user *models.UserModel) (string, string, error) {
@@ -90,13 +82,13 @@ func (s *authService) GenerateToken(user *models.UserModel) (string, string, err
 
 	var secretKeyByte = []byte(s.JWT_SECRET_KEY)
 
-	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims).SignedString(secretKeyByte)
+	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodRS256, accessClaims).SignedString(secretKeyByte)
 
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString(secretKeyByte)
+	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodRS256, refreshClaims).SignedString(secretKeyByte)
 
 	if err != nil {
 		return "", "", err

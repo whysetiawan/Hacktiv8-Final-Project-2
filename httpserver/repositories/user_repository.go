@@ -15,6 +15,7 @@ type TodoRepository interface {
 type UserRepository interface {
 	Register(user *models.UserModel) (*models.UserModel, error)
 	Login(user *models.UserModel) (*models.UserModel, error)
+	GetUsers() (*[]models.UserModel, error)
 }
 
 type userRepository struct {
@@ -41,4 +42,15 @@ func (r *userRepository) Login(user *models.UserModel) (*models.UserModel, error
 	}
 
 	return user, nil
+}
+
+func (r *userRepository) GetUsers() (*[]models.UserModel, error) {
+	var users []models.UserModel
+	err := r.db.Find(&users).Limit(10).Error
+
+	if err != nil {
+		return &users, err
+	}
+
+	return &users, nil
 }

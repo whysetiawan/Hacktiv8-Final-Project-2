@@ -46,7 +46,7 @@ func main() {
 	// todoService := services.NewTodoService(todoRepository)
 	// todoController := controllers.NewTodoController(todoService)
 
-	routers.UserRouter(appRoute, userController)
+	routers.UserRouter(appRoute, userController, authService)
 
 	docs.SwaggerInfo.Title = "Hacktiv8 final-project-2 API"
 	docs.SwaggerInfo.Description = "This is just a simple TODO List"
