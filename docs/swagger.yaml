@@ -26,6 +26,31 @@ definitions:
     - password
     - username
     type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  models.CommentModel:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      message:
+        type: string
+      photo_id:
+        type: integer
+      updatedAt:
+        type: string
+      user_id:
+        type: integer
+    type: object
   models.LoginResponse:
     properties:
       access_token:
@@ -33,10 +58,93 @@ definitions:
       refresh_token:
         type: string
     type: object
+  models.PhotoModel:
+    properties:
+      comment:
+        items:
+          $ref: '#/definitions/models.CommentModel'
+        type: array
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      photo_id:
+        type: integer
+      photo_url:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.SocialMediaModel:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      name:
+        type: string
+      social_media_id:
+        type: integer
+      social_media_url:
+        type: string
+      updatedAt:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.UserModel:
+    properties:
+      age:
+        type: integer
+      comments:
+        items:
+          $ref: '#/definitions/models.CommentModel'
+        type: array
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      photos:
+        items:
+          $ref: '#/definitions/models.PhotoModel'
+        type: array
+      social_medias:
+        items:
+          $ref: '#/definitions/models.SocialMediaModel'
+        type: array
+      updatedAt:
+        type: string
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
   utils.HttpError:
     properties:
       message: {}
       stack_trace: {}
+    type: object
+  utils.HttpSuccess-array_models_UserModel:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.UserModel'
+        type: array
+      message: {}
     type: object
   utils.HttpSuccess-dto_RegisterDto:
     properties:
@@ -60,6 +168,28 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 paths:
+  /user:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess-array_models_UserModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      summary: get mutilple users
+      tags:
+      - User
   /user/login:
     post:
       parameters:

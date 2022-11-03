@@ -14,6 +14,7 @@ import (
 type UserController interface {
 	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
+	GetUsers(ctx *gin.Context)
 }
 
 type userController struct {
@@ -87,7 +88,7 @@ func (c *userController) Login(ctx *gin.Context) {
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.Password))
-	print(dto.Password)
+
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, utils.NewHttpError("Invalid Credentials", err.Error()))
 		return
@@ -104,4 +105,22 @@ func (c *userController) Login(ctx *gin.Context) {
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}))
+}
+
+// GetUsers godoc
+// @Tags    User
+// @Summary get mutilple users
+// @Success 200 {object} utils.HttpSuccess[[]models.UserModel]
+// @Failure 401 {object} utils.HttpError
+// @Failure 400 {object} utils.HttpError
+// @Failure 500 {object} utils.HttpError
+// @Router  /user [get]
+func (c *userController) GetUsers(ctx *gin.Context) {
+	users, err := c.userService.GetUsers()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.NewHttpError("Internal Server Error", err.Error()))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, utils.NewHttpSuccess("Get All Success", users))
 }

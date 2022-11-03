@@ -15,6 +15,7 @@ type TodoService interface {
 type UserService interface {
 	Register(dto *dto.RegisterDto) (*models.UserModel, error)
 	Login(dto *dto.LoginDto) (*models.UserModel, error)
+	GetUsers() (*[]models.UserModel, error)
 }
 
 type userService struct {
@@ -51,4 +52,8 @@ func (s *userService) Login(dto *dto.LoginDto) (*models.UserModel, error) {
 		return &user, err
 	}
 	return &user, nil
+}
+
+func (s *userService) GetUsers() (*[]models.UserModel, error) {
+	return s.userRepository.GetUsers()
 }
