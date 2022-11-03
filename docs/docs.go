@@ -24,20 +24,20 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/todo": {
+        "/user/login": {
             "post": {
                 "tags": [
-                    "Todo"
+                    "User"
                 ],
-                "summary": "create a todo",
+                "summary": "login a user",
                 "parameters": [
                     {
-                        "description": "Create Todo DTO",
-                        "name": "todo",
+                        "description": "Login User DTO",
+                        "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateTodoDto"
+                            "$ref": "#/definitions/dto.LoginDto"
                         }
                     }
                 ],
@@ -45,7 +45,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.HttpSuccess-any"
+                            "$ref": "#/definitions/utils.HttpSuccess-models_LoginResponse"
                         }
                     },
                     "400": {
@@ -63,63 +63,28 @@ const docTemplate = `{
                 }
             }
         },
-        "/todo/update/{id}": {
-            "put": {
+        "/user/register": {
+            "post": {
                 "tags": [
-                    "Todo"
+                    "User"
                 ],
-                "summary": "update a todo",
+                "summary": "create a user",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
+                        "description": "Create User DTO",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RegisterDto"
+                        }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/utils.HttpSuccess-models_UserModel"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HttpError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HttpError"
-                        }
-                    }
-                }
-            }
-        },
-        "/todo/{id}": {
-            "delete": {
-                "tags": [
-                    "Todo"
-                ],
-                "summary": "create a todo",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HttpSuccess-models_UserModel"
+                            "$ref": "#/definitions/utils.HttpSuccess-dto_RegisterDto"
                         }
                     },
                     "400": {
@@ -139,33 +104,51 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.CreateTodoDto": {
+        "dto.LoginDto": {
             "type": "object",
             "required": [
-                "name"
+                "email",
+                "password"
             ],
             "properties": {
-                "name": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }
         },
-        "models.UserModel": {
+        "dto.RegisterDto": {
             "type": "object",
+            "required": [
+                "age",
+                "email",
+                "password",
+                "username"
+            ],
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "boolean"
-                },
-                "todo_id": {
+                "age": {
                     "type": "integer"
                 },
-                "updated_at": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
                     "type": "string"
                 }
             }
@@ -177,18 +160,20 @@ const docTemplate = `{
                 "stack_trace": {}
             }
         },
-        "utils.HttpSuccess-any": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "message": {}
-            }
-        },
-        "utils.HttpSuccess-models_UserModel": {
+        "utils.HttpSuccess-dto_RegisterDto": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/models.UserModel"
+                    "$ref": "#/definitions/dto.RegisterDto"
+                },
+                "message": {}
+            }
+        },
+        "utils.HttpSuccess-models_LoginResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/models.LoginResponse"
                 },
                 "message": {}
             }

@@ -6,12 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func TodoRouter(route *gin.RouterGroup, todoController controllers.TodoController) *gin.RouterGroup {
-	todoRouter := route.Group("/todo")
+func UserRouter(route *gin.RouterGroup, userController controllers.UserController) *gin.RouterGroup {
+	userRouter := route.Group("/user")
 	{
-		todoRouter.POST("", todoController.CreateTodo)
-		todoRouter.DELETE(":id", todoController.DeleteTodo)
-		todoRouter.PUT("/update/:id", todoController.UpdateTodo)
+		userRouter.POST("register", userController.Register)
+		userRouter.POST("login", userController.Login)
 	}
-	return todoRouter
+	return userRouter
 }

@@ -7,8 +7,8 @@ import (
 type UserModel struct {
 	gorm.Model
 	UserId       uint               `gorm:"primaryKey;column:id"  json:"user_id"`
-	Username     string             `json:"username"`
-	Email        string             `json:"email"`
+	Username     string             `gorm:"uniqueIndex" json:"username"`
+	Email        string             `gorm:"uniqueIndex" json:"email"`
 	Password     string             `json:"password"`
 	Age          uint8              `json:"age"`
 	SocialMedia  []SocialMediaModel `json:"social_medias" gorm:"foreignKey:SocialMediaId"`
@@ -20,6 +20,7 @@ func (UserModel) TableName() string {
 	return "public.User"
 }
 
-type UserParams struct {
-	ID int64 `uri:"id" binding:"required"`
+type LoginResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
