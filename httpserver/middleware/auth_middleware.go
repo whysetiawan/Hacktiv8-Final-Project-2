@@ -19,7 +19,7 @@ func JwtGuard(s services.AuthService) gin.HandlerFunc {
 			return
 		}
 
-		splitToken := strings.Split(accessToken, " ")[1]
+		splitToken := strings.Split(accessToken, " ")
 
 		if len(splitToken) < 2 {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewHttpError("Unauthorized", nil))
@@ -31,7 +31,7 @@ func JwtGuard(s services.AuthService) gin.HandlerFunc {
 		isVerified, user, err := s.VerifyToken(string(jwtToken))
 
 		if !isVerified {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewHttpError("Unauthorized", err))
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewHttpError("Unauthorized", err.Error()))
 			return
 		}
 

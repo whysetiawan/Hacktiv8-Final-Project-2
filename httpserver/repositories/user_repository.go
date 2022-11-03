@@ -4,6 +4,7 @@ import (
 	"final-project-2/httpserver/models"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type TodoRepository interface {
@@ -46,7 +47,7 @@ func (r *userRepository) Login(user *models.UserModel) (*models.UserModel, error
 
 func (r *userRepository) GetUsers() (*[]models.UserModel, error) {
 	var users []models.UserModel
-	err := r.db.Find(&users).Limit(10).Error
+	err := r.db.Preload(clause.Associations).Find(&users).Limit(10).Error
 
 	if err != nil {
 		return &users, err
