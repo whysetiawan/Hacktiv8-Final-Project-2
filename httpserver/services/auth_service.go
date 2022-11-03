@@ -29,7 +29,6 @@ func NewAuthService() *authService {
 }
 
 func (s *authService) VerifyToken(accessToken string) (bool, interface{}, error) {
-
 	jwtToken, err := jwt.Parse(accessToken, func(t *jwt.Token) (interface{}, error) {
 		method, isRsa := t.Method.(*jwt.SigningMethodHMAC)
 		if !isRsa {
