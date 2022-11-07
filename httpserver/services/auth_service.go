@@ -84,13 +84,13 @@ func (s *authService) GenerateToken(user *models.UserModel) (string, string, err
 	fmt.Println("SECRET KEY", s.JWT_SECRET_KEY)
 	var secretKeyByte = []byte(s.JWT_SECRET_KEY)
 
-	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims).SignedString(secretKeyByte)
+	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodRS256, accessClaims).SignedString(secretKeyByte)
 
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString(secretKeyByte)
+	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodRS256, refreshClaims).SignedString(secretKeyByte)
 
 	if err != nil {
 		return "", "", err
