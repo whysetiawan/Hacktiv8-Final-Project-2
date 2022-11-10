@@ -419,10 +419,38 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/models.UserModel"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserModel"
+                    }
                 },
                 "message": {}
             }
+        },
+        "utils.HttpSuccess-dto_RegisterDto": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.RegisterDto"
+                },
+                "message": {}
+            }
+        },
+        "utils.HttpSuccess-models_LoginResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/models.LoginResponse"
+                },
+                "message": {}
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     },
     "securityDefinitions": {

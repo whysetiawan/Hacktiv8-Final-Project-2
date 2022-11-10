@@ -59,6 +59,7 @@ func (s *userService) UpdateUser(dto *dto.UpsertUserDto) (*models.UserModel, err
 
 	_, err := s.userRepository.UpdateUser(&user)
 
+	_, err := s.userRepository.Login(&user)
 	if err != nil {
 		return &user, err
 	}

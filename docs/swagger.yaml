@@ -159,7 +159,21 @@ definitions:
   utils.HttpSuccess-models_UserModel:
     properties:
       data:
-        $ref: '#/definitions/models.UserModel'
+        items:
+          $ref: '#/definitions/models.UserModel'
+        type: array
+      message: {}
+    type: object
+  utils.HttpSuccess-dto_RegisterDto:
+    properties:
+      data:
+        $ref: '#/definitions/dto.RegisterDto'
+      message: {}
+    type: object
+  utils.HttpSuccess-models_LoginResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.LoginResponse'
       message: {}
     type: object
 host: localhost:3030
