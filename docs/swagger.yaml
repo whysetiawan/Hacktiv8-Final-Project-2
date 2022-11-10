@@ -10,7 +10,7 @@ definitions:
     - email
     - password
     type: object
-  dto.RegisterDto:
+  dto.UpsertUserDto:
     properties:
       age:
         type: integer
@@ -128,8 +128,6 @@ definitions:
         type: array
       updatedAt:
         type: string
-      user_id:
-        type: integer
       username:
         type: string
     type: object
@@ -146,16 +144,22 @@ definitions:
         type: array
       message: {}
     type: object
-  utils.HttpSuccess-dto_RegisterDto:
+  utils.HttpSuccess-dto_UpsertUserDto:
     properties:
       data:
-        $ref: '#/definitions/dto.RegisterDto'
+        $ref: '#/definitions/dto.UpsertUserDto'
       message: {}
     type: object
   utils.HttpSuccess-models_LoginResponse:
     properties:
       data:
         $ref: '#/definitions/models.LoginResponse'
+      message: {}
+    type: object
+  utils.HttpSuccess-models_UserModel:
+    properties:
+      data:
+        $ref: '#/definitions/models.UserModel'
       message: {}
     type: object
 host: localhost:3030
@@ -175,6 +179,29 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/utils.HttpSuccess-array_models_UserModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - BearerAuth: []
+      summary: get mutilple users
+      tags:
+      - User
+    put:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess-models_UserModel'
         "400":
           description: Bad Request
           schema:
@@ -225,12 +252,12 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/dto.RegisterDto'
+          $ref: '#/definitions/dto.UpsertUserDto'
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/utils.HttpSuccess-dto_RegisterDto'
+            $ref: '#/definitions/utils.HttpSuccess-dto_UpsertUserDto'
         "400":
           description: Bad Request
           schema:
