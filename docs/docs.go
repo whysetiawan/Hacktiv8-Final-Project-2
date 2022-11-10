@@ -26,6 +26,11 @@ const docTemplate = `{
     "paths": {
         "/user": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "User"
                 ],
@@ -35,6 +40,43 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/utils.HttpSuccess-array_models_UserModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "get mutilple users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpSuccess-models_UserModel"
                         }
                     },
                     "400": {
@@ -110,7 +152,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterDto"
+                            "$ref": "#/definitions/dto.UpsertUserDto"
                         }
                     }
                 ],
@@ -118,7 +160,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/utils.HttpSuccess-dto_RegisterDto"
+                            "$ref": "#/definitions/utils.HttpSuccess-dto_UpsertUserDto"
                         }
                     },
                     "400": {
@@ -153,7 +195,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.RegisterDto": {
+        "dto.UpsertUserDto": {
             "type": "object",
             "required": [
                 "age",
@@ -331,9 +373,6 @@ const docTemplate = `{
                 "updatedAt": {
                     "type": "string"
                 },
-                "user_id": {
-                    "type": "integer"
-                },
                 "username": {
                     "type": "string"
                 }
@@ -347,6 +386,36 @@ const docTemplate = `{
             }
         },
         "utils.HttpSuccess-array_models_UserModel": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserModel"
+                    }
+                },
+                "message": {}
+            }
+        },
+        "utils.HttpSuccess-dto_UpsertUserDto": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.UpsertUserDto"
+                },
+                "message": {}
+            }
+        },
+        "utils.HttpSuccess-models_LoginResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/models.LoginResponse"
+                },
+                "message": {}
+            }
+        },
+        "utils.HttpSuccess-models_UserModel": {
             "type": "object",
             "properties": {
                 "data": {
@@ -375,6 +444,20 @@ const docTemplate = `{
                 },
                 "message": {}
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

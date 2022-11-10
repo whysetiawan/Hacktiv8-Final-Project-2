@@ -4,18 +4,14 @@ import (
 	"final-project-2/httpserver/models"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
-
-type TodoRepository interface {
-	CreateTodo(todo models.UserModel) (models.UserModel, error)
-	DeleteTodo(todo models.UserModel) (models.UserModel, error)
-	UpdateTodo(data models.UserModel, id int64) (models.UserModel, error)
-}
 
 type UserRepository interface {
 	Register(user *models.UserModel) (*models.UserModel, error)
 	Login(user *models.UserModel) (*models.UserModel, error)
 	GetUsers() (*[]models.UserModel, error)
+	UpdateUser(user *models.UserModel) (*models.UserModel, error)
 }
 
 type userRepository struct {
@@ -35,7 +31,7 @@ func (r *userRepository) Register(user *models.UserModel) (*models.UserModel, er
 }
 
 func (r *userRepository) Login(user *models.UserModel) (*models.UserModel, error) {
-	err := r.db.Find(&user).Where("email = ?", user.Email).Error
+	err := r.db.Find(user).Where("email = ?", user.Email).Error
 
 	if err != nil {
 		return user, err
@@ -46,11 +42,22 @@ func (r *userRepository) Login(user *models.UserModel) (*models.UserModel, error
 
 func (r *userRepository) GetUsers() (*[]models.UserModel, error) {
 	var users []models.UserModel
-	err := r.db.Find(&users).Limit(10).Error
+	err := r.db.Preload(clause.Associations).Find(&users).Limit(10).Error
 
 	if err != nil {
 		return &users, err
 	}
 
 	return &users, nil
+}
+
+func (r *userRepository) UpdateUser(user *models.UserModel) (*models.UserModel, error) {
+	err := r.db.Model(user).Updates(user).Error
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+
 }

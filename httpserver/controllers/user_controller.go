@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"errors"
 	"final-project-2/httpserver/dto"
 	"final-project-2/httpserver/models"
 	"final-project-2/httpserver/services"
 	"final-project-2/utils"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,13 +34,13 @@ func NewUserController(
 // Register godoc
 // @Tags    User
 // @Summary create a user
-// @Param   user body     dto.RegisterDto true "Create User DTO"
-// @Success 201  {object} utils.HttpSuccess[dto.RegisterDto]
+// @Param   user body     dto.UpsertUserDto true "Create User DTO"
+// @Success 201  {object} utils.HttpSuccess[dto.UpsertUserDto]
 // @Failure 400  {object} utils.HttpError
 // @Failure 500  {object} utils.HttpError
 // @Router  /user/register [post]
 func (c *userController) Register(ctx *gin.Context) {
-	var dto dto.RegisterDto
+	var dto dto.UpsertUserDto
 	err := ctx.BindJSON(&dto)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", err.Error()))
@@ -108,19 +110,75 @@ func (c *userController) Login(ctx *gin.Context) {
 }
 
 // GetUsers godoc
-// @Tags    User
-// @Summary get mutilple users
-// @Success 200 {object} utils.HttpSuccess[[]models.UserModel]
-// @Failure 401 {object} utils.HttpError
-// @Failure 400 {object} utils.HttpError
-// @Failure 500 {object} utils.HttpError
-// @Router  /user [get]
+// @Tags     User
+// @Summary  get mutilple users
+// @Success  200 {object} utils.HttpSuccess[[]models.UserModel]
+// @Failure  401 {object} utils.HttpError
+// @Failure  400 {object} utils.HttpError
+// @Failure  500 {object} utils.HttpError
+// @Router   /user [get]
+// @Security BearerAuth
 func (c *userController) GetUsers(ctx *gin.Context) {
 	users, err := c.userService.GetUsers()
+
+	// userCredential, _ := ctx.Get("user")
+
+	// userData := userCredential.(jwt.MapClaims)["data"].(map[string]interface{})
+
+	// userModel := models.UserModel{
+	// 	Username: userData["username"].(string),
+	// 	Email:    userData["email"].(string),
+	// }
+
+	// fmt.Println(userModel.Email)
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.NewHttpError("Internal Server Error", err.Error()))
 		return
 	}
 
 	ctx.JSON(http.StatusOK, utils.NewHttpSuccess("Get All Success", users))
+}
+
+// UpdateUser godoc
+// @Tags     User
+// @Summary  Update a user based on JWT
+// @Success  200 {object} utils.HttpSuccess[models.UserModel]
+// @Failure  401 {object} utils.HttpError
+// @Failure  400 {object} utils.HttpError
+// @Failure  500 {object} utils.HttpError
+// @Router   /user [put]
+// @Security BearerAuth
+func (c *userController) UpdateUser(ctx *gin.Context) {
+	var dto dto.UpsertUserDto
+	err := ctx.BindJSON(&dto)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", err.Error()))
+		return
+	}
+
+	userCredential, isExist := ctx.Get("user")
+
+	userData := userCredential.(map[string]interface{})["data"].(map[string]interface{})
+
+	userModel := models.UserModel{
+		Username: userData["username"].(string),
+		Email:    userData["email"].(string),
+	}
+
+	fmt.Println(userModel.Email)
+
+	if !isExist {
+		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", errors.New("invalid credential")))
+		return
+	}
+
+	user, err := c.userService.UpdateUser(&dto)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.NewHttpError("Internal Server Error", err.Error()))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, utils.NewHttpSuccess("Update User Success", user))
 }
