@@ -12,6 +12,7 @@ type UserRepository interface {
 	Login(user *models.UserModel) (*models.UserModel, error)
 	GetUsers() (*[]models.UserModel, error)
 	UpdateUser(user *models.UserModel) (*models.UserModel, error)
+	DeleteUser(user *models.UserModel) (*models.UserModel, error)
 }
 
 type userRepository struct {
@@ -27,6 +28,16 @@ func (r *userRepository) Register(user *models.UserModel) (*models.UserModel, er
 	if err != nil {
 		return user, err
 	}
+	return user, nil
+}
+
+func (r *userRepository) GetUser(user *models.UserModel) (*models.UserModel, error) {
+	err := r.db.Find(user).Error
+
+	if err != nil {
+		return user, err
+	}
+
 	return user, nil
 }
 
@@ -52,7 +63,7 @@ func (r *userRepository) GetUsers() (*[]models.UserModel, error) {
 }
 
 func (r *userRepository) UpdateUser(user *models.UserModel) (*models.UserModel, error) {
-	err := r.db.Model(user).Updates(user).Error
+	err := r.db.Model(user).Omit("SocialMedia", "Photo", "Comment").Updates(user).Error
 
 	if err != nil {
 		return user, err
@@ -60,4 +71,14 @@ func (r *userRepository) UpdateUser(user *models.UserModel) (*models.UserModel, 
 
 	return user, nil
 
+}
+
+func (r *userRepository) DeleteUser(user *models.UserModel) (*models.UserModel, error) {
+	err := r.db.Preload(clause.Associations).Delete(user).Error
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }
