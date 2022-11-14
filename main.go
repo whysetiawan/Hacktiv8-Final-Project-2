@@ -7,7 +7,7 @@ import (
 	"final-project-2/httpserver/repositories"
 	"final-project-2/httpserver/routers"
 	"final-project-2/httpserver/services"
-	"fmt"
+	"final-project-2/utils"
 	"log"
 
 	"github.com/gin-gonic/gin" // swagger embed files
@@ -41,8 +41,7 @@ func main() {
 
 	userRepository := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepository)
-	authService := services.NewAuthService()
-	fmt.Println("THIS AUTH SERVICE", authService.JWT_SECRET_KEY)
+	authService := utils.NewAuthHelper()
 	userController := controllers.NewUserController(userService, authService)
 	// todoRepository := repositories.NewTodoRepository(db)
 	// todoService := services.NewTodoService(todoRepository)
@@ -65,10 +64,6 @@ func main() {
 	// cmd, err := exec.Command("swag", "fmt").Output()
 	// log.Println(cmd)
 	// log.Println("Swagger Generated")
-
-	if err != nil {
-		fmt.Println(err)
-	}
 
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	app.Run(":3000")

@@ -71,12 +71,23 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "get mutilple users",
+                "summary": "create a user",
+                "parameters": [
+                    {
+                        "description": "Update User Based On Token",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpsertUserDto"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.HttpSuccess-models_UserModel"
+                            "$ref": "#/definitions/utils.HttpSuccess-dto_UpsertUserDto"
                         }
                     },
                     "400": {
@@ -85,8 +96,33 @@ const docTemplate = `{
                             "$ref": "#/definitions/utils.HttpError"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "delete current user based on JWT",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpSuccess-dto_UpsertUserDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/utils.HttpError"
                         }
@@ -343,11 +379,11 @@ const docTemplate = `{
                         "$ref": "#/definitions/models.CommentModel"
                     }
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
+                "deleted_at": {
+                    "type": "string"
                 },
                 "email": {
                     "type": "string"
@@ -370,7 +406,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/models.SocialMediaModel"
                     }
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 },
                 "username": {
@@ -414,43 +450,6 @@ const docTemplate = `{
                 },
                 "message": {}
             }
-        },
-        "utils.HttpSuccess-models_UserModel": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.UserModel"
-                    }
-                },
-                "message": {}
-            }
-        },
-        "utils.HttpSuccess-dto_RegisterDto": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/dto.RegisterDto"
-                },
-                "message": {}
-            }
-        },
-        "utils.HttpSuccess-models_LoginResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/models.LoginResponse"
-                },
-                "message": {}
-            }
-        }
-    },
-    "securityDefinitions": {
-        "BearerAuth": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
         }
     },
     "securityDefinitions": {

@@ -1,11 +1,7 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type UserModel struct {
-	gorm.Model
+	BaseModel
 	Username     string             `gorm:"uniqueIndex" json:"username"`
 	Email        string             `gorm:"uniqueIndex" json:"email"`
 	Password     string             `json:"password"`

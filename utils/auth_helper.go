@@ -1,34 +1,33 @@
-package services
+package utils
 
 import (
 	"encoding/json"
 	"errors"
 	"final-project-2/httpserver/models"
-	"final-project-2/utils"
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 )
 
-type AuthService interface {
+type AuthHelper interface {
 	VerifyToken(token string) (bool, interface{}, error)
 	GenerateToken(user *models.UserModel) (string, string, error)
+	JwtClaimsToUserModel(jwt.MapClaims) models.UserModel
 }
 
-type authService struct {
+type authHelper struct {
 	JWT_SECRET_KEY string
 }
 
-func NewAuthService() *authService {
-	constants := &utils.Constants
+func NewAuthHelper() *authHelper {
+	constants := &Constants
 	print("constants.JWT_SECRET_KEY", constants.JWT_SECRET_KEY)
-	return &authService{
+	return &authHelper{
 		JWT_SECRET_KEY: constants.JWT_SECRET_KEY,
 	}
 }
 
-func (s *authService) VerifyToken(accessToken string) (bool, interface{}, error) {
+func (s *authHelper) VerifyToken(accessToken string) (bool, interface{}, error) {
 	jwtToken, err := jwt.Parse(accessToken, func(t *jwt.Token) (interface{}, error) {
 		method, isRsa := t.Method.(*jwt.SigningMethodHMAC)
 		if !isRsa {
@@ -62,7 +61,7 @@ func (s *authService) VerifyToken(accessToken string) (bool, interface{}, error)
 
 }
 
-func (s *authService) GenerateToken(user *models.UserModel) (string, string, error) {
+func (s *authHelper) GenerateToken(user *models.UserModel) (string, string, error) {
 	const ttlAccessToken = 24 * time.Hour
 	const ttlRefreshToken = (24 * 7) * time.Hour
 
@@ -81,7 +80,6 @@ func (s *authService) GenerateToken(user *models.UserModel) (string, string, err
 		"data": userMap,
 		"exp":  time.Now().UTC().Add(ttlRefreshToken).Unix(),
 	}
-	fmt.Println("SECRET KEY", s.JWT_SECRET_KEY)
 	var secretKeyByte = []byte(s.JWT_SECRET_KEY)
 
 	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims).SignedString(secretKeyByte)
@@ -97,4 +95,18 @@ func (s *authService) GenerateToken(user *models.UserModel) (string, string, err
 	}
 
 	return accessToken, refreshToken, nil
+}
+
+func (s *authHelper) JwtClaimsToUserModel(claims jwt.MapClaims) models.UserModel {
+	data := claims["data"].(map[string]interface{})
+	user := models.UserModel{
+		BaseModel: models.BaseModel{
+			ID: uint(data["id"].(float64)),
+		},
+		Username: data["username"].(string),
+		Password: data["password"].(string),
+		Email:    data["email"].(string),
+		Age:      uint8(data["age"].(float64)),
+	}
+	return user
 }
