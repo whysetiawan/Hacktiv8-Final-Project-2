@@ -35,7 +35,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Environment Variables not found")
 	}
-
 	app := gin.Default()
 	appRoute := app.Group("/api")
 	db, _ := config.Connect()
