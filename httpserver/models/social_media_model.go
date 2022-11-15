@@ -1,11 +1,7 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type SocialMediaModel struct {
-	gorm.Model
+	BaseModel
 	SocialMediaId  uint   `gorm:"primaryKey;column:id" json:"social_media_id"`
 	Name           string `json:"name"`
 	SocialMediaUrl string `json:"social_media_url"`
