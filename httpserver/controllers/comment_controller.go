@@ -31,9 +31,10 @@ func NewCommentController(
 	return &commentController{commentService}
 }
 
-// GetUsers godoc
+// CreateComment godoc
 // @Tags     Comment
 // @Summary  Create Comment
+// @Param   user body     dto.UpsertComment true "Create User DTO"
 // @Success  200 {object} utils.HttpSuccess[models.CommentModel]
 // @Failure  401 {object} utils.HttpError
 // @Failure  400 {object} utils.HttpError
@@ -41,22 +42,23 @@ func NewCommentController(
 // @Router   /comment [post]
 // @Security BearerAuth
 func (c *commentController) CreateComment(ctx *gin.Context) {
-	var dto dto.Comment
+
+	var dto dto.CreateCommentDto
 	err := ctx.BindJSON(&dto)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", err.Error()))
 		return
 	}
 
-	CommentCredential, isExist := ctx.Get("comment")
+	userCredential, isExist := ctx.Get("user")
 
 	if !isExist {
 		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", errors.New("invalid credential")))
 		return
 	}
-	CommentModel := CommentCredential.(models.CommentModel)
+	userModel := userCredential.(models.UserModel)
 
-	res, err := c.commentService.CreateComment(&dto, CommentModel.ID)
+	res, err := c.commentService.CreateComment(&dto, userModel.ID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", err.Error()))
 		return
@@ -107,39 +109,41 @@ func (c *commentController) GetCommentByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.NewHttpSuccess("Get Comment by ID Success", result))
 }
 
-// UpdateUser godoc
+// UpdateComment godoc
 // @Tags    Comment
 // @Summary Update Comment
-// @Param   user body     dto.Comment true "Update Comment Based On Token"
-// @Success 200  {object} utils.HttpSuccess[dto.Comment]
+// @Param   user body     dto.UpdateCommentDto true "Update Comment Based On Token"
+// @Success 200  {object} utils.HttpSuccess[models.CommentModel]
 // @Failure 400  {object} utils.HttpError
 // @Failure 500  {object} utils.HttpError
 // @Router   /comment/:commentID [put]
 // @Security BearerAuth
 func (c *commentController) UpdateComment(ctx *gin.Context) {
-	var dto dto.Comment
-	if err := ctx.ShouldBind(&dto); err != nil {
-		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Failed to bind photo request", err.Error()))
+	fmt.Println("UPDATING COMMENT")
+	var dto dto.UpdateCommentDto
+	err := ctx.BindJSON(&dto)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", err.Error()))
 		return
 	}
 
-	idd := ctx.Param("commentID")
-	commentID, err := strconv.Atoi(idd)
+	id := ctx.Param("commentID")
+	commentID, err := strconv.Atoi(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", err.Error()))
 		return
 	}
 
-	commentCredental, isExist := ctx.Get("comment")
+	userCredential, isExist := ctx.Get("user")
 
 	if !isExist {
 		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", errors.New("invalid credential")))
 		return
 	}
 
-	commentModel := commentCredental.(models.CommentModel)
-	res, err := c.commentService.UpdateComment(&dto, uint(commentID), commentModel.ID)
+	userModel := userCredential.(models.UserModel)
+	res, err := c.commentService.UpdateComment(&dto, uint(commentID), userModel.ID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Failed to Update Comment", err.Error()))
 		return
@@ -164,19 +168,20 @@ func (c *commentController) DeleteComment(ctx *gin.Context) {
 		return
 	}
 
-	commentCredential, isExist := ctx.Get("comment")
-	commentModel := commentCredential.(models.CommentModel)
+	userCredential, isExist := ctx.Get("user")
 
 	if !isExist {
 		ctx.JSON(http.StatusBadRequest, utils.NewHttpError("Bad Request", errors.New("invalid credential")))
 		return
 	}
 
-	_, err = c.commentService.DeleteComment(commentModel.ID, uint(commentID))
+	userModel := userCredential.(models.UserModel)
+
+	_, err = c.commentService.DeleteComment(userModel.ID, uint(commentID))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.NewHttpError("Internal Server Error", err.Error()))
 		return
 	}
-	message := fmt.Sprintf("Comment %d has been deleted", commentModel.ID)
+	message := fmt.Sprintf("Comment %d has been deleted", userModel.ID)
 	ctx.JSON(http.StatusOK, utils.NewHttpSuccess(message, struct{}{}))
 }

@@ -22,12 +22,12 @@ func NewCommentRepository(db *gorm.DB) *commentRepository {
 	return &commentRepository{db}
 }
 
-func (r *commentRepository) CreateComment(commentCreate *models.CommentModel) (*models.CommentModel, error) {
-	err := r.db.Create(&commentCreate).Error
+func (r *commentRepository) CreateComment(comment *models.CommentModel) (*models.CommentModel, error) {
+	err := r.db.Create(&comment).Error
 	if err != nil {
-		return commentCreate, err
+		return comment, err
 	}
-	return commentCreate, nil
+	return comment, nil
 }
 
 func (r *commentRepository) GetComment() (*[]models.CommentModel, error) {
@@ -52,7 +52,7 @@ func (r *commentRepository) GetCommentByID(id uint) (models.CommentModel, error)
 }
 
 func (r *commentRepository) UpdateComment(comment *models.CommentModel) (*models.CommentModel, error) {
-	err := r.db.Model(comment).Where(("id = ?"), comment.ID).Update("message", comment).Error
+	err := r.db.Model(comment).Where("id = ?", comment.ID).Update("message", comment.Message).Error
 	if err != nil {
 		return comment, err
 	}

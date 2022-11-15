@@ -4,14 +4,13 @@ import (
 	"final-project-2/httpserver/dto"
 	"final-project-2/httpserver/models"
 	"final-project-2/httpserver/repositories"
-	"fmt"
 )
 
 type CommentService interface {
-	CreateComment(dto *dto.Comment, userId uint) (*models.CommentModel, error)
+	CreateComment(dto *dto.CreateCommentDto, userID uint) (*models.CommentModel, error)
 	GetComment() (*[]models.CommentModel, error)
 	GetCommentByID(id uint) (models.CommentModel, error)
-	UpdateComment(dto *dto.Comment, commentID uint, userID uint) (*models.CommentModel, error)
+	UpdateComment(dto *dto.UpdateCommentDto, commentID uint, userID uint) (*models.CommentModel, error)
 	DeleteComment(userID uint, commentID uint) (*models.CommentModel, error)
 }
 
@@ -23,17 +22,17 @@ func NewCommentService(r repositories.CommentRepository) *commentService {
 	return &commentService{r}
 }
 
-func (s *commentService) CreateComment(dto *dto.Comment, userId uint) (*models.CommentModel, error) {
-	res := models.CommentModel{
-		UserID:  userId,
+func (s *commentService) CreateComment(dto *dto.CreateCommentDto, userID uint) (*models.CommentModel, error) {
+
+	commentModel := models.CommentModel{
+		UserID:  userID,
 		Message: dto.Message,
 		PhotoID: dto.PhotoId,
 	}
-	fmt.Println(res)
 
-	comment, err := s.commentRepository.CreateComment(&res)
+	comment, err := s.commentRepository.CreateComment(&commentModel)
 	if err != nil {
-		return &res, err
+		return &commentModel, err
 	}
 
 	return comment, nil
@@ -52,12 +51,13 @@ func (s *commentService) GetCommentByID(id uint) (models.CommentModel, error) {
 	return res, err
 }
 
-func (s *commentService) UpdateComment(dto *dto.Comment, commentID uint, userID uint) (*models.CommentModel, error) {
+func (s *commentService) UpdateComment(dto *dto.UpdateCommentDto, commentID uint, userID uint) (*models.CommentModel, error) {
 	commentModel := models.CommentModel{
 		BaseModel: models.BaseModel{
-			ID: dto.ID,
+			ID: commentID,
 		},
 		Message: dto.Message,
+		UserID:  userID,
 	}
 
 	commen, err := s.commentRepository.UpdateComment(&commentModel)
