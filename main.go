@@ -8,10 +8,8 @@ import (
 	"final-project-2/httpserver/routers"
 	"final-project-2/httpserver/services"
 	"final-project-2/utils"
-	"log"
 
 	"github.com/gin-gonic/gin" // swagger embed files
-	"github.com/joho/godotenv"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
@@ -30,11 +28,11 @@ import (
 // @name                       Authorization
 func main() {
 
-	err := godotenv.Load()
+	// err := godotenv.Load()
 
-	if err != nil {
-		log.Fatal("Environment Variables not found")
-	}
+	// if err != nil {
+	// 	log.Fatal("Environment Variables not found")
+	// }
 	app := gin.Default()
 	appRoute := app.Group("/api")
 	db, _ := config.Connect()
