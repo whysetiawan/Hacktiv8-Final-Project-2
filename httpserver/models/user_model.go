@@ -6,9 +6,9 @@ type UserModel struct {
 	Email        string             `gorm:"uniqueIndex" json:"email"`
 	Password     string             `json:"password"`
 	Age          uint8              `json:"age"`
-	SocialMedia  []SocialMediaModel `json:"social_medias" gorm:"foreignKey:SocialMediaId"`
-	PhotoModel   []PhotoModel       `json:"photos" gorm:"foreignKey:PhotoId"`
-	CommentModel []CommentModel     `json:"comments" gorm:"foreignKey:CommentId"`
+	SocialMedia  []SocialMediaModel `json:"social_medias" gorm:"foreignKey:UserId;references:ID"`
+	PhotoModel   []PhotoModel       `json:"photos" gorm:"foreignKey:UserId;references:ID"`
+	CommentModel []CommentModel     `json:"comments" gorm:"foreignKey:UserId;references:ID"`
 }
 
 func (UserModel) TableName() string {

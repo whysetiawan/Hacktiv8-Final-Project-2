@@ -51,12 +51,12 @@ func (c *socialMediaController) CreateSocialMedia(ctx *gin.Context) {
 
 	userModel := userCredential.(models.UserModel)
 
-	_, err = c.socialMediaService.CreateSocialMedia(&dto, userModel.ID)
+	socialMedia, err := c.socialMediaService.CreateSocialMedia(&dto, userModel.ID)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.NewHttpError("Internal Server Error", err.Error()))
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, utils.NewHttpSuccess("User Registered", &dto))
+	ctx.JSON(http.StatusCreated, utils.NewHttpSuccess("Social Media Created", socialMedia))
 }
