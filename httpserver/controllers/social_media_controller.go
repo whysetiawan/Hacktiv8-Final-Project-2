@@ -64,7 +64,6 @@ func (c *socialMediaController) CreateSocialMedia(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, utils.NewHttpSuccess("Social Media Created", socialMedia))
-<<<<<<< HEAD
 }
 
 // GetSocialMedias godoc
@@ -142,7 +141,7 @@ func (c *socialMediaController) UpdateSocialMediaByID(ctx *gin.Context) {
 }
 
 // DeleteSocialMedia godoc
-// @Tags     SocialMedia
+// @Tags     Social Media
 // @Summary  Delete Social Media By ID
 // @Param    id          path     int                      true "Social Media ID"
 // @Success  200 {object} utils.HttpSuccess[string]
@@ -175,6 +174,4 @@ func (c *socialMediaController) DeleteSocialMedia(ctx *gin.Context) {
 	}
 	message := fmt.Sprintf("Social Media ID %d has been deleted", socialMediaID)
 	ctx.JSON(http.StatusOK, utils.NewHttpSuccess(message, struct{}{}))
-=======
->>>>>>> 9608a17a1a02f56d3ed18d6aa91a31f0730a7a73
 }
