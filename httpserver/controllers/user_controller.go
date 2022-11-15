@@ -123,12 +123,12 @@ func (c *userController) GetUsers(ctx *gin.Context) {
 }
 
 // UpdateUser godoc
-// @Tags    User
-// @Summary create a user
-// @Param   user body     dto.UpsertUserDto true "Update User Based On Token"
-// @Success 200  {object} utils.HttpSuccess[dto.UpsertUserDto]
-// @Failure 400  {object} utils.HttpError
-// @Failure 500  {object} utils.HttpError
+// @Tags     User
+// @Summary  create a user
+// @Param    user body     dto.UpsertUserDto true "Update User Based On Token"
+// @Success  200  {object} utils.HttpSuccess[dto.UpsertUserDto]
+// @Failure  400  {object} utils.HttpError
+// @Failure  500  {object} utils.HttpError
 // @Router   /user [put]
 // @Security BearerAuth
 func (c *userController) UpdateUser(ctx *gin.Context) {
@@ -158,11 +158,11 @@ func (c *userController) UpdateUser(ctx *gin.Context) {
 }
 
 // DeleteUser godoc
-// @Tags    User
-// @Summary delete current user based on JWT
-// @Success 200  {object} utils.HttpSuccess[dto.UpsertUserDto]
-// @Failure 400  {object} utils.HttpError
-// @Failure 500  {object} utils.HttpError
+// @Tags     User
+// @Summary  delete current user based on JWT
+// @Success  200 {object} utils.HttpSuccess[string]
+// @Failure  400 {object} utils.HttpError
+// @Failure  500 {object} utils.HttpError
 // @Router   /user [delete]
 // @Security BearerAuth
 func (c *userController) DeleteUser(ctx *gin.Context) {

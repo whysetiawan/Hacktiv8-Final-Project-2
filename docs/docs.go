@@ -25,6 +25,37 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/socialmedias": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "Social Media"
+                ],
+                "summary": "get all social medias based on user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpSuccess-array_models_SocialMediaModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -34,11 +65,11 @@ const docTemplate = `{
                 "tags": [
                     "Social Media"
                 ],
-                "summary": "create a user",
+                "summary": "create a social media",
                 "parameters": [
                     {
-                        "description": "Create User DTO",
-                        "name": "user",
+                        "description": "Create Social Media DTO",
+                        "name": "SocialMedia",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -51,6 +82,97 @@ const docTemplate = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/utils.HttpSuccess-models_SocialMediaModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    }
+                }
+            }
+        },
+        "/socialmedias/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "Social Media"
+                ],
+                "summary": "create a user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Social Media ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Social Media Based On User",
+                        "name": "SocialMedia",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpsertSocialMediaDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpSuccess-models_SocialMediaModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "SocialMedia"
+                ],
+                "summary": "Delete Social Media By ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Social Media ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpSuccess-string"
                         }
                     },
                     "400": {
@@ -162,7 +284,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.HttpSuccess-dto_UpsertUserDto"
+                            "$ref": "#/definitions/utils.HttpSuccess-string"
                         }
                     },
                     "400": {
@@ -412,9 +534,6 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "social_media_id": {
-                    "type": "integer"
-                },
                 "social_media_url": {
                     "type": "string"
                 },
@@ -480,6 +599,18 @@ const docTemplate = `{
                 "stack_trace": {}
             }
         },
+        "utils.HttpSuccess-array_models_SocialMediaModel": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.SocialMediaModel"
+                    }
+                },
+                "message": {}
+            }
+        },
         "utils.HttpSuccess-array_models_UserModel": {
             "type": "object",
             "properties": {
@@ -515,6 +646,15 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/models.SocialMediaModel"
+                },
+                "message": {}
+            }
+        },
+        "utils.HttpSuccess-string": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
                 },
                 "message": {}
             }
