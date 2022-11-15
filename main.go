@@ -49,8 +49,13 @@ func main() {
 	socialMediaService := services.NewSocialMediaService(socialMediaRepository)
 	socialMediaController := controllers.NewSocialMediaController(socialMediaService)
 
+	commentRepository := repositories.NewCommentRepository(db)
+	commentService := services.NewCommentService(commentRepository)
+	commentController := controllers.NewCommentController(commentService)
+
 	routers.UserRouter(appRoute, userController, authService)
 	routers.SocialMediaRouter(appRoute, socialMediaController, authService)
+	routers.CommentRoutes(appRoute, commentController, authService)
 
 	docs.SwaggerInfo.Title = "Hacktiv8 final-project-2 API"
 	docs.SwaggerInfo.Description = "This is just a simple TODO List"
