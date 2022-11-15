@@ -5,7 +5,6 @@ import (
 	"final-project-2/httpserver/dto"
 	"final-project-2/httpserver/models"
 	"final-project-2/httpserver/repositories"
-	"time"
 )
 
 type PhotoService interface {
@@ -29,9 +28,9 @@ func (ps photoService) Create(input dto.InputPhoto, userID int64) (models.PhotoM
 	photo.Title = input.Title
 	photo.Caption = input.Caption
 	photo.PhotoUrl = input.PhotoUrl
-	photo.CreatedAt = time.Now()
-	photo.UpdatedAt = time.Now()
-	photo.UserId = uint(userID)
+	// photo.CreatedAt = time.Now()
+	// photo.UpdatedAt = time.Now()
+	photo.BaseModel.ID = uint(userID)
 
 	newPhoto, err := ps.photoRepository.Save(photo)
 	if err != nil {
@@ -44,7 +43,7 @@ func (ps photoService) Create(input dto.InputPhoto, userID int64) (models.PhotoM
 		Caption:   photo.Caption,
 		PhotoUrl:  photo.PhotoUrl,
 		UserID:    userID,
-		CreatedAt: photo.CreatedAt,
+		CreatedAt: photo.BaseModel.CreatedAt,
 	}
 
 	return result, nil
@@ -70,7 +69,7 @@ func (ps photoService) UpdatePhoto(input dto.InputPhoto, photoId int64, userID i
 		return photo, err
 	}
 
-	if int64(photo.UserId) != userID {
+	if int64(photo.BaseModel.ID) != userID {
 		return photo, errors.New("you dont have access")
 	}
 
@@ -101,7 +100,7 @@ func (ps photoService) DeletePhoto(id, userId int64) (map[string]string, error) 
 		}, err
 	}
 
-	if int64(photo.UserId) != userId {
+	if int64(photo.BaseModel.ID) != userId {
 		return map[string]string{
 			"en": "you dont have access to delete photo",
 		}, err
