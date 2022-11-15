@@ -30,7 +30,7 @@ func (ps photoService) Create(input dto.InputPhoto, userID int64) (models.PhotoM
 	photo.PhotoUrl = input.PhotoUrl
 	// photo.CreatedAt = time.Now()
 	// photo.UpdatedAt = time.Now()
-	photo.BaseModel.ID = uint(userID)
+	photo.UserID = uint(userID)
 
 	newPhoto, err := ps.photoRepository.Save(photo)
 	if err != nil {

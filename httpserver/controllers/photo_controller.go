@@ -50,9 +50,8 @@ func (pc photoController) CreatePhoto(ctx *gin.Context) {
 	}
 
 	userModel := userCredential.(models.UserModel)
-	// userID := int64(userModel.ID)
-	userID := int64(userModel.ID)
-	newPhoto, err := pc.photoService.Create(param, userID)
+
+	newPhoto, err := pc.photoService.Create(param, int64(userModel.ID))
 	if err != nil {
 		log.Fatal(err.Error())
 		ctx.JSON(http.StatusInternalServerError, utils.NewHttpError("Internal Server Error", err.Error()))
@@ -138,7 +137,6 @@ func (pc photoController) DeletePhoto(ctx *gin.Context) {
 	}
 
 	userModel := userCredential.(models.UserModel)
-	// userID := int64(userModel.ID)
 	userID := int64(userModel.ID)
 	newPhoto, err := pc.photoService.DeletePhoto(int64(id), userID)
 	if err != nil {
