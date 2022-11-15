@@ -101,8 +101,6 @@ definitions:
         type: integer
       name:
         type: string
-      social_media_id:
-        type: integer
       social_media_url:
         type: string
       updated_at:
@@ -146,6 +144,14 @@ definitions:
       message: {}
       stack_trace: {}
     type: object
+  utils.HttpSuccess-array_models_SocialMediaModel:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.SocialMediaModel'
+        type: array
+      message: {}
+    type: object
   utils.HttpSuccess-array_models_UserModel:
     properties:
       data:
@@ -172,6 +178,12 @@ definitions:
         $ref: '#/definitions/models.SocialMediaModel'
       message: {}
     type: object
+  utils.HttpSuccess-string:
+    properties:
+      data:
+        type: string
+      message: {}
+    type: object
 host: localhost:3030
 info:
   contact:
@@ -183,17 +195,93 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 paths:
   /socialmedias:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess-array_models_SocialMediaModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - BearerAuth: []
+      summary: get all social medias based on user
+      tags:
+      - Social Media
     post:
       parameters:
-      - description: Create User DTO
+      - description: Create Social Media DTO
         in: body
-        name: user
+        name: SocialMedia
         required: true
         schema:
           $ref: '#/definitions/dto.UpsertSocialMediaDto'
       responses:
         "201":
           description: Created
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess-models_SocialMediaModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - BearerAuth: []
+      summary: create a social media
+      tags:
+      - Social Media
+  /socialmedias/{id}:
+    delete:
+      parameters:
+      - description: Social Media ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess-string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - BearerAuth: []
+      summary: Delete Social Media By ID
+      tags:
+      - SocialMedia
+    put:
+      parameters:
+      - description: Social Media ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Social Media Based On User
+        in: body
+        name: SocialMedia
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpsertSocialMediaDto'
+      responses:
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/utils.HttpSuccess-models_SocialMediaModel'
         "400":
@@ -215,7 +303,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.HttpSuccess-dto_UpsertUserDto'
+            $ref: '#/definitions/utils.HttpSuccess-string'
         "400":
           description: Bad Request
           schema:

@@ -12,6 +12,10 @@ func SocialMediaRouter(route *gin.RouterGroup, socialMediaController controllers
 	socialMediaRouter := route.Group("/socialmedias")
 	{
 		socialMediaRouter.POST("", middleware.JwtGuard(authService), socialMediaController.CreateSocialMedia)
+		socialMediaRouter.PUT("/:id", middleware.JwtGuard(authService), socialMediaController.UpdateSocialMediaByID)
+		socialMediaRouter.GET("", middleware.JwtGuard(authService), socialMediaController.
+			GetSocialMedias)
+		socialMediaRouter.DELETE("/:id", middleware.JwtGuard(authService), socialMediaController.DeleteSocialMedia)
 	}
 	return socialMediaRouter
 }
