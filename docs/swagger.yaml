@@ -12,7 +12,9 @@ definitions:
     type: object
   dto.UpsertSocialMediaDto:
     properties:
-      name:
+      email:
+        type: string
+      password:
         type: string
       social_media_url:
         type: string
@@ -247,10 +249,11 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/dto.RegisterDto'
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/utils.HttpSuccess-string'
         "400":
