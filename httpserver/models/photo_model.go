@@ -2,19 +2,17 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
-type PhotoModel struct {
-	gorm.Model
-	PhotoId      uint           `gorm:"primaryKey;column:id" json:"photo_id"`
-	Title        string         `json:"title" binding:"required"`
-	Caption      string         `json:"caption" binding:"required"`
-	PhotoUrl     string         `json:"photo_url" binding:"required"`
-	UserId       uint           `json:"user_id"`
-	CommentModel []CommentModel `json:"comment,omitempty" gorm:"foreignKey:CommentId"`
-}
+// type PhotoModel struct {
+// 	gorm.Model
+// 	PhotoId      uint           `gorm:"primaryKey;column:id" json:"photo_id"`
+// 	Title        string         `json:"title" binding:"required"`
+// 	Caption      string         `json:"caption" binding:"required"`
+// 	PhotoUrl     string         `json:"photo_url" binding:"required"`
+// 	UserId       uint           `json:"user_id"`
+// 	CommentModel []CommentModel `json:"comment,omitempty" gorm:"foreignKey:CommentId"`
+// }
 
 // type Photo struct {
 // 	ID        uint   `gorm:"primayKey;column:id" json:"id"`
@@ -33,6 +31,15 @@ type PhotoModelResponse struct {
 	PhotoUrl  string    `json:"photo_url,omitempty"`
 	UserID    int64     `json:"user_id,omitempty"`
 	CreatedAt time.Time `json:"date,omitempty"`
+}
+
+type PhotoModel struct {
+	BaseModel
+	Title        string         `json:"title"`
+	Caption      string         `json:"caption"`
+	PhotoUrl     string         `json:"photo_url"`
+	UserID       uint           `json:"user_id"`
+	CommentModel []CommentModel `json:"comment" gorm:"foreignKey:PhotoID;references:ID"`
 }
 
 func (PhotoModel) TableName() string {

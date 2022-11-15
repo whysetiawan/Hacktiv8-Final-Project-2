@@ -11,7 +11,6 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin" // swagger embed files
-	"github.com/joho/godotenv"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
@@ -30,28 +29,38 @@ import (
 // @name                       Authorization
 func main() {
 
-	err := godotenv.Load()
+	// err := godotenv.Load()
 
-	if err != nil {
-		log.Fatal("Environment Variables not found")
-	}
+	// if err != nil {
+	// 	log.Fatal("Environment Variables not found")
+	// }
 	app := gin.Default()
 	appRoute := app.Group("/api")
-	db, _ := config.Connect()
+	db, err := config.Connect()
+	if err != nil {
+		log.Println("err db")
+	}
+
+	authService := utils.NewAuthHelper()
 
 	userRepository := repositories.NewUserRepository(db)
 	photoRepo := repositories.NewPhotoRepository(db)
 	userService := services.NewUserService(userRepository)
 	photoService := services.NewPhotoService(photoRepo)
-	authService := utils.NewAuthHelper()
+	// authService := utils.NewAuthHelper()
 	userController := controllers.NewUserController(userService, authService)
 	photoController := controllers.NewPhotoController(photoService, authService)
 	// todoRepository := repositories.NewTodoRepository(db)
 	// todoService := services.NewTodoService(todoRepository)
 	// todoController := controllers.NewTodoController(todoService)
 
+	socialMediaRepository := repositories.NewSocialMediaRepository(db)
+	socialMediaService := services.NewSocialMediaService(socialMediaRepository)
+	socialMediaController := controllers.NewSocialMediaController(socialMediaService)
+
 	routers.PhotoRouter(appRoute, photoController, authService)
 	routers.UserRouter(appRoute, userController, authService)
+	routers.SocialMediaRouter(appRoute, socialMediaController, authService)
 
 	docs.SwaggerInfo.Title = "Hacktiv8 final-project-2 API"
 	docs.SwaggerInfo.Description = "This is just a simple TODO List"
