@@ -42,7 +42,7 @@ func (r *userRepository) GetUser(user *models.UserModel) (*models.UserModel, err
 }
 
 func (r *userRepository) Login(user *models.UserModel) (*models.UserModel, error) {
-	err := r.db.Find(user).Where("email = ?", user.Email).Error
+	err := r.db.Where("email = ?", user.Email).First(user).Error
 
 	if err != nil {
 		return user, err

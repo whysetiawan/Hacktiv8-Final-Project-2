@@ -54,11 +54,12 @@ func (s *userService) Login(dto *dto.LoginDto) (*models.UserModel, error) {
 		Password: dto.Password,
 	}
 
-	_, err := s.userRepository.Login(&user)
+	result, err := s.userRepository.Login(&user)
 	if err != nil {
 		return &user, err
 	}
-	return &user, nil
+
+	return result, nil
 }
 
 func (s *userService) UpdateUser(dto *dto.UpsertUserDto, user *models.UserModel) (*models.UserModel, error) {
