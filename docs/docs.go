@@ -61,6 +61,79 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "create a user",
+                "parameters": [
+                    {
+                        "description": "Update User Based On Token",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpsertUserDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpSuccess-dto_UpsertUserDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "delete current user based on JWT",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpSuccess-dto_UpsertUserDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HttpError"
+                        }
+                    }
+                }
             }
         },
         "/user/login": {
@@ -115,7 +188,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterDto"
+                            "$ref": "#/definitions/dto.UpsertUserDto"
                         }
                     }
                 ],
@@ -123,7 +196,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/utils.HttpSuccess-dto_RegisterDto"
+                            "$ref": "#/definitions/utils.HttpSuccess-dto_UpsertUserDto"
                         }
                     },
                     "400": {
@@ -158,7 +231,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.RegisterDto": {
+        "dto.UpsertUserDto": {
             "type": "object",
             "required": [
                 "age",
@@ -306,11 +379,11 @@ const docTemplate = `{
                         "$ref": "#/definitions/models.CommentModel"
                     }
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
+                "deleted_at": {
+                    "type": "string"
                 },
                 "email": {
                     "type": "string"
@@ -333,11 +406,8 @@ const docTemplate = `{
                         "$ref": "#/definitions/models.SocialMediaModel"
                     }
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
-                },
-                "user_id": {
-                    "type": "integer"
                 },
                 "username": {
                     "type": "string"
@@ -363,11 +433,11 @@ const docTemplate = `{
                 "message": {}
             }
         },
-        "utils.HttpSuccess-dto_RegisterDto": {
+        "utils.HttpSuccess-dto_UpsertUserDto": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/dto.RegisterDto"
+                    "$ref": "#/definitions/dto.UpsertUserDto"
                 },
                 "message": {}
             }

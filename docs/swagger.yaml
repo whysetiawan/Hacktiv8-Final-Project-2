@@ -10,7 +10,7 @@ definitions:
     - email
     - password
     type: object
-  dto.RegisterDto:
+  dto.UpsertUserDto:
     properties:
       age:
         type: integer
@@ -108,10 +108,10 @@ definitions:
         items:
           $ref: '#/definitions/models.CommentModel'
         type: array
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
+      deleted_at:
+        type: string
       email:
         type: string
       id:
@@ -126,10 +126,8 @@ definitions:
         items:
           $ref: '#/definitions/models.SocialMediaModel'
         type: array
-      updatedAt:
+      updated_at:
         type: string
-      user_id:
-        type: integer
       username:
         type: string
     type: object
@@ -146,10 +144,10 @@ definitions:
         type: array
       message: {}
     type: object
-  utils.HttpSuccess-dto_RegisterDto:
+  utils.HttpSuccess-dto_UpsertUserDto:
     properties:
       data:
-        $ref: '#/definitions/dto.RegisterDto'
+        $ref: '#/definitions/dto.UpsertUserDto'
       message: {}
     type: object
   utils.HttpSuccess-models_LoginResponse:
@@ -169,6 +167,25 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 paths:
   /user:
+    delete:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess-dto_UpsertUserDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - BearerAuth: []
+      summary: delete current user based on JWT
+      tags:
+      - User
     get:
       responses:
         "200":
@@ -190,6 +207,32 @@ paths:
       security:
       - BearerAuth: []
       summary: get mutilple users
+      tags:
+      - User
+    put:
+      parameters:
+      - description: Update User Based On Token
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpsertUserDto'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess-dto_UpsertUserDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - BearerAuth: []
+      summary: create a user
       tags:
       - User
   /user/login:
@@ -225,12 +268,12 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/dto.RegisterDto'
+          $ref: '#/definitions/dto.UpsertUserDto'
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/utils.HttpSuccess-dto_RegisterDto'
+            $ref: '#/definitions/utils.HttpSuccess-dto_UpsertUserDto'
         "400":
           description: Bad Request
           schema:

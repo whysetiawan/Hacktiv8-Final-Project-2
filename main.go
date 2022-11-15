@@ -7,7 +7,7 @@ import (
 	"final-project-2/httpserver/repositories"
 	"final-project-2/httpserver/routers"
 	"final-project-2/httpserver/services"
-	"fmt"
+	"final-project-2/utils"
 	"log"
 
 	"github.com/gin-gonic/gin" // swagger embed files
@@ -40,14 +40,17 @@ func main() {
 	db, _ := config.Connect()
 
 	userRepository := repositories.NewUserRepository(db)
+	photoRepo := repositories.NewPhotoRepository(db)
 	userService := services.NewUserService(userRepository)
-	authService := services.NewAuthService()
-	fmt.Println("THIS AUTH SERVICE", authService.JWT_SECRET_KEY)
+	photoService := services.NewPhotoService(photoRepo)
+	authService := utils.NewAuthHelper()
 	userController := controllers.NewUserController(userService, authService)
+	photoController := controllers.NewPhotoController(photoService, authService)
 	// todoRepository := repositories.NewTodoRepository(db)
 	// todoService := services.NewTodoService(todoRepository)
 	// todoController := controllers.NewTodoController(todoService)
 
+	routers.PhotoRouter(appRoute, photoController, authService)
 	routers.UserRouter(appRoute, userController, authService)
 
 	docs.SwaggerInfo.Title = "Hacktiv8 final-project-2 API"
@@ -65,10 +68,6 @@ func main() {
 	// cmd, err := exec.Command("swag", "fmt").Output()
 	// log.Println(cmd)
 	// log.Println("Swagger Generated")
-
-	if err != nil {
-		fmt.Println(err)
-	}
 
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	app.Run(":3000")
