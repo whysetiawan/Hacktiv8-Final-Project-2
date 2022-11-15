@@ -12,9 +12,7 @@ definitions:
     type: object
   dto.UpsertSocialMediaDto:
     properties:
-      email:
-        type: string
-      password:
+      name:
         type: string
       social_media_url:
         type: string
@@ -38,27 +36,17 @@ definitions:
     - password
     - username
     type: object
-  gorm.DeletedAt:
-    properties:
-      time:
-        type: string
-      valid:
-        description: Valid is true if Time is not NULL
-        type: boolean
-    type: object
   models.CommentModel:
     properties:
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
+      deleted_at:
+        type: string
       id:
         type: integer
       message:
         type: string
-      photo_id:
-        type: integer
-      updatedAt:
+      updated_at:
         type: string
       user_id:
         type: integer
@@ -76,19 +64,17 @@ definitions:
         items:
           $ref: '#/definitions/models.CommentModel'
         type: array
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
+      deleted_at:
+        type: string
       id:
-        type: integer
-      photo_id:
         type: integer
       photo_url:
         type: string
       title:
         type: string
-      updatedAt:
+      updated_at:
         type: string
       user_id:
         type: integer
@@ -249,11 +235,10 @@ paths:
         in: path
         name: id
         required: true
-        schema:
-          $ref: '#/definitions/dto.RegisterDto'
+        type: integer
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/utils.HttpSuccess-string'
         "400":
@@ -268,7 +253,7 @@ paths:
       - BearerAuth: []
       summary: Delete Social Media By ID
       tags:
-      - SocialMedia
+      - Social Media
     put:
       parameters:
       - description: Social Media ID

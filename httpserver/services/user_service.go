@@ -28,7 +28,6 @@ func (s *userService) Register(dto *dto.UpsertUserDto) (*models.UserModel, error
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
 
-	_, err := s.userRepository.Login(&user)
 	if err != nil {
 		return nil, err
 	}
