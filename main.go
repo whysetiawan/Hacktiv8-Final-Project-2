@@ -67,5 +67,5 @@ func main() {
 	// log.Println("Swagger Generated")
 
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	app.Run(":3000")
+	app.Run()
 }
