@@ -39,15 +39,18 @@ func main() {
 	appRoute := app.Group("/api")
 	db, _ := config.Connect()
 
+	authService := utils.NewAuthHelper()
+
 	userRepository := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepository)
-	authService := utils.NewAuthHelper()
 	userController := controllers.NewUserController(userService, authService)
-	// todoRepository := repositories.NewTodoRepository(db)
-	// todoService := services.NewTodoService(todoRepository)
-	// todoController := controllers.NewTodoController(todoService)
+
+	socialMediaRepository := repositories.NewSocialMediaRepository(db)
+	socialMediaService := services.NewSocialMediaService(socialMediaRepository)
+	socialMediaController := controllers.NewSocialMediaController(socialMediaService)
 
 	routers.UserRouter(appRoute, userController, authService)
+	routers.SocialMediaRouter(appRoute, socialMediaController, authService)
 
 	docs.SwaggerInfo.Title = "Hacktiv8 final-project-2 API"
 	docs.SwaggerInfo.Description = "This is just a simple TODO List"
