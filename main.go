@@ -37,7 +37,7 @@ func main() {
 	appRoute := app.Group("/api")
 	db, _ := config.Connect()
 
-	authService := utils.NewAuthHelper()
+	authService := utils.NewAuthHelper(utils.Constants.JWT_SECRET_KEY)
 
 	userRepository := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepository)

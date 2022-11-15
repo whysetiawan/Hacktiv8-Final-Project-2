@@ -19,11 +19,9 @@ type authHelper struct {
 	JWT_SECRET_KEY string
 }
 
-func NewAuthHelper() *authHelper {
-	constants := &Constants
-	print("constants.JWT_SECRET_KEY", constants.JWT_SECRET_KEY)
+func NewAuthHelper(jwtSecret string) *authHelper {
 	return &authHelper{
-		JWT_SECRET_KEY: constants.JWT_SECRET_KEY,
+		JWT_SECRET_KEY: jwtSecret,
 	}
 }
 
