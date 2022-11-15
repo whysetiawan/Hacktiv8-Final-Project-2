@@ -141,7 +141,7 @@ func (c *socialMediaController) UpdateSocialMediaByID(ctx *gin.Context) {
 }
 
 // DeleteSocialMedia godoc
-// @Tags     SocialMedia
+// @Tags     Social Media
 // @Summary  Delete Social Media By ID
 // @Param    id          path     int                      true "Social Media ID"
 // @Success  200 {object} utils.HttpSuccess[string]
