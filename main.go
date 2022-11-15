@@ -7,7 +7,7 @@ import (
 	"final-project-2/httpserver/repositories"
 	"final-project-2/httpserver/routers"
 	"final-project-2/httpserver/services"
-	"fmt"
+	"final-project-2/utils"
 	"log"
 
 	"github.com/gin-gonic/gin" // swagger embed files
@@ -39,16 +39,18 @@ func main() {
 	appRoute := app.Group("/api")
 	db, _ := config.Connect()
 
+	authService := utils.NewAuthHelper()
+
 	userRepository := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepository)
-	authService := services.NewAuthService()
-	fmt.Println("THIS AUTH SERVICE", authService.JWT_SECRET_KEY)
 	userController := controllers.NewUserController(userService, authService)
-	// todoRepository := repositories.NewTodoRepository(db)
-	// todoService := services.NewTodoService(todoRepository)
-	// todoController := controllers.NewTodoController(todoService)
+
+	socialMediaRepository := repositories.NewSocialMediaRepository(db)
+	socialMediaService := services.NewSocialMediaService(socialMediaRepository)
+	socialMediaController := controllers.NewSocialMediaController(socialMediaService)
 
 	routers.UserRouter(appRoute, userController, authService)
+	routers.SocialMediaRouter(appRoute, socialMediaController, authService)
 
 	docs.SwaggerInfo.Title = "Hacktiv8 final-project-2 API"
 	docs.SwaggerInfo.Description = "This is just a simple TODO List"
@@ -65,10 +67,6 @@ func main() {
 	// cmd, err := exec.Command("swag", "fmt").Output()
 	// log.Println(cmd)
 	// log.Println("Swagger Generated")
-
-	if err != nil {
-		fmt.Println(err)
-	}
 
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	app.Run(":3000")
